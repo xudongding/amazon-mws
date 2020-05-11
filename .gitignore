@@ -1,0 +1,11 @@
+# PhpStorm project files
+.idea
+
+# Composer vendor dir
+/vendor
+
+# Composer lock file
+composer.lock
+
+# Test web root
+/web
