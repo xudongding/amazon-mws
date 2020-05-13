@@ -274,7 +274,7 @@ class MWSClient
      */
     public function submitFeed($feedType, $feedContent, $purgeAndReplace = false)
     {
-        // 数据内容
+        // Feed content
         if (is_array($feedContent)) {
             $feedContent = array_merge(
                 [
@@ -288,7 +288,7 @@ class MWSClient
             $feedContent = ArrayToXml::convert($feedContent, 'AmazonEnvelope');
         }
 
-        // 请求参数
+        // Request parameters
         $queryParams = [
             'FeedType' => $feedType,
             'PurgeAndReplace' => $purgeAndReplace,
@@ -297,7 +297,7 @@ class MWSClient
             $queryParams['MarketplaceIdList.Id.1'] = $this->config['marketplaceId'];
         }
 
-        // 处理响应并返回
+        // Request and return
         $response = $this->sendRequest('SubmitFeed', $queryParams, $feedContent);
         return [
             'feedSubmissionId' => $response['SubmitFeedResult']['FeedSubmissionInfo']['FeedSubmissionId'],
@@ -318,14 +318,14 @@ class MWSClient
      */
     protected function sendRequest($requestAction, $queryParams = [], $requestBody = null, $responseRaw = false)
     {
-        // 获取端点
+        // Endpoint
         if (isset(static::$endpoints[$requestAction])) {
             $endPoint = static::$endpoints[$requestAction];
         } else {
             throw new Exception("Call to undefined action '{$requestAction}'.");
         }
 
-        // 合并公共查询参数
+        // Merge common query parameters
         $commonQueryParams = [
             'AWSAccessKeyId' => $this->config['accessKeyId'],
             'Action' => $endPoint['action'],
@@ -337,7 +337,7 @@ class MWSClient
         ];
         $queryParams = array_merge($commonQueryParams, $queryParams);
 
-        // 查询参数 Auth Token 和 Marketplace ID
+        // Auth Token and Marketplace ID
         if (!empty($this->config['authToken'])) {
             $queryParams['MWSAuthToken'] = $this->config['authToken'];
         }
