@@ -98,6 +98,24 @@ class MWSClient
             'path' => '/',
             'version' => '2009-01-01'
         ],
+        'RequestReport' => [
+            'method' => 'POST',
+            'action' => 'RequestReport',
+            'path' => '/',
+            'version' => '2009-01-01'
+        ],
+        'GetReportList' => [
+            'method' => 'POST',
+            'action' => 'GetReportList',
+            'path' => '/',
+            'version' => '2009-01-01'
+        ],
+        'GetReport' => [
+            'method' => 'POST',
+            'action' => 'GetReport',
+            'path' => '/',
+            'version' => '2009-01-01'
+        ],
     ];
 
     /**
@@ -305,6 +323,54 @@ class MWSClient
             'submittedDate' => $response['SubmitFeedResult']['FeedSubmissionInfo']['SubmittedDate'],
             'feedProcessingStatus' => $response['SubmitFeedResult']['FeedSubmissionInfo']['FeedProcessingStatus'],
         ];
+    }
+
+    /**
+     * Request report
+     * @param string $reportType Report type
+     * @param int|null $startTimestamp Start timestamp
+     * @param int|null $endTimestamp End timestamp
+     * @return string|null Report request ID
+     * @throws Exception
+     */
+    public function requestReport($reportType, $startTimestamp = null, $endTimestamp = null)
+    {
+        $endpoint = 'RequestReport';
+        $queryParams = ['ReportType' => $reportType];
+        if ($startTimestamp !== null) {
+            $queryParams['StartDate'] = gmdate(self::DATE_FORMAT, $startTimestamp);
+        }
+        if ($endTimestamp !== null) {
+            $queryParams['EndDate'] = gmdate(self::DATE_FORMAT, $endTimestamp);
+        }
+
+        $response = $this->sendRequest($endpoint, $queryParams);
+        if (!empty($response[$endpoint . 'Result']['ReportRequestInfo']['ReportRequestId'])) {
+            return $response[$endpoint . 'Result']['ReportRequestInfo']['ReportRequestId'];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get report
+     * @param string $reportRequestId Report request ID
+     * @return array|string|null Report data
+     * @throws Exception
+     */
+    public function getReport($reportRequestId)
+    {
+        $endpoint = 'GetReportList';
+        $queryParams = ['ReportRequestIdList.Id.1' => $reportRequestId];
+        $response = $this->sendRequest($endpoint, $queryParams);
+        if (!empty($response[$endpoint . 'Result']['ReportInfo']['ReportId'])) {
+            $reportId = $response[$endpoint . 'Result']['ReportInfo']['ReportId'];
+            $endpoint = 'GetReport';
+            $queryParams = ['ReportId' => $reportId];
+            return $this->sendRequest($endpoint, $queryParams);
+        } else {
+            return null;
+        }
     }
 
     /**

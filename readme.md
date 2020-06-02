@@ -8,6 +8,9 @@ $ composer require glitzhub/amazon-mws
 ```
 
 ### Usage
+
+Instantiate MWS client
+
 ```php
 $mwsClient = new GlitzHub\MWSClient([
     'accessKeyId' => 'AWS_ACCESS_KEY_ID',   // AWSAccessKeyId
@@ -16,23 +19,35 @@ $mwsClient = new GlitzHub\MWSClient([
     'sellerId' => 'SELLER_ID',              // SellerId
     'authToken' => 'MWS_AUTH_TOKEN',        // MWSAuthToken
 ]);
+```
 
-// List orders
+List orders
+
+```php
 $orders = $mwsClient->listOrders(
     time() - 3600,
     null,
     ['Unshipped', 'PartiallyShipped'],
     ['AFN', 'MFN']
 );
+```
 
-// List order items
+List order items
+
+```php
 $items = $mwsClient->listOrderItems('AMAZON_ORDER_ID');
+```
 
-// Get order by Amazon order ID
+Get order by Amazon order ID
+
+```php
 $order = $mwsClient->getOrder('AMAZON_ORDER_ID');
 $orders = $mwsClient->getOrder(['AMAZON_ORDER_ID_1', 'AMAZON_ORDER_ID_2']);
+```
 
-// Send order fulfillment feed
+Send order fulfillment feed
+
+```php
 $feedType = '_POST_ORDER_FULFILLMENT_DATA_';
 $feedContent = [
     'MessageType' => 'OrderFulfillment',
@@ -63,8 +78,11 @@ $feedContent = [
     ]
 ];
 $response = $mwsClient->submitFeed($feedType, $feedContent);
+```
 
-// Send inventory feed
+Send inventory feed
+
+```php
 $feedType = '_POST_INVENTORY_AVAILABILITY_DATA_';
 $feedContent = [
     'MessageType' => 'Inventory',
@@ -88,4 +106,20 @@ $feedContent = [
     ]
 ];
 $response = $mwsClient->submitFeed($feedType, $feedContent);
+```
+
+Request report
+
+```php
+$requestReportId = $mwsClient->requestReport(
+    '_GET_AFN_INVENTORY_DATA_',
+    strtotime('2020-05-01 00:00'),
+    strtotime('2020-06-01 00:00')
+);
+```
+
+Get report
+
+```php
+$report = $mwsClient->getReport('REQUEST_REPORT_ID');
 ```
